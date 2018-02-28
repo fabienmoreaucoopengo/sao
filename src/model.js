@@ -737,7 +737,6 @@
             var name, value;
             var rec_named_fields = ['many2one', 'one2one', 'reference'];
             var later = {};
-            var promises = [];
             var fieldnames = [];
             for (name in values) {
                 if (!values.hasOwnProperty(name)) {
@@ -779,17 +778,10 @@
                 this.model.fields[name].set(this, value);
                 this._loaded[name] = true;
             }
-            for (var fname in this.model.fields) {
-                var field = this.model.fields[fname];
-                if (field.description.autocomplete &&
-                        field.description.autocomplete.length > 0) {
-                    promises.push(this.do_autocomplete(fname));
-                }
-            }
             if (validate) {
-                promises.push(this.validate(fieldnames, true));
+                return this.validate(fieldnames, true);
             }
-            return jQuery.when.apply(jQuery, promises);
+            return jQuery.when();
         },
         get: function() {
             var value = {};
@@ -835,16 +827,6 @@
             this.model.fields[name].set_client(this, value, force_change);
         },
         default_get: function(rec_name) {
-            var dfd = jQuery.Deferred();
-            var promises = [];
-            // Ensure promisses is filled before default_get is resolved
-            for (var fname in this.model.fields) {
-                var field = this.model.fields[fname];
-                if (field.description.autocomplete &&
-                        field.description.autocomplete.length > 0) {
-                    promises.push(this.do_autocomplete(fname));
-                }
-            }
             if (!jQuery.isEmptyObject(this.model.fields)) {
                 var context = this.get_context();
                 if (context.default_rec_name === undefined) {
@@ -852,7 +834,7 @@
                 }
                 var prm = this.model.execute('default_get',
                         [Object.keys(this.model.fields)], context);
-                prm.then(function(values) {
+                return prm.then(function(values) {
                     if (this.group.parent &&
                             this.group.parent_name in this.group.model.fields) {
                         var parent_field =
@@ -867,15 +849,10 @@
                                 this.group.parent.id;
                         }
                     }
-                    promises.push(this.set_default(values));
-                    jQuery.when.apply(jQuery, promises).then(function() {
-                        dfd.resolve(values);
-                    });
+                    return this.set_default(values);
                 }.bind(this));
-            } else {
-                dfd.resolve();
             }
-            return dfd;
+            return jQuery.when();
         },
         set_default: function(values, validate) {
             if (validate === null || validate === undefined) {
