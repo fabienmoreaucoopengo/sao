@@ -114,32 +114,6 @@ module.exports = function(grunt) {
             }
         }
     },
-    copy: {
-      main: {
-        files: [
-          { src: 'bower_components/jquery/dist/jquery.min.js', dest: 'dist/js/jquery.min.js' },
-          { src: 'bower_components/bootstrap/dist/js/bootstrap.min.js', dest: 'dist/js/bootstrap.min.js' },
-          { src: 'bower_components/moment/min/moment.min.js', dest: 'dist/js/moment.min.js' },
-          { src: 'bower_components/moment/min/locales.min.js', dest: 'dist/js/locales.min.js' },
-          { src: 'bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js', dest: 'dist/js/bootstrap-datetimepicker.min.js' },
-          { src: 'bower_components/gettext.js/dist/gettext.min.js', dest: 'dist/js/gettext.min.js' },
-          { src: 'bower_components/d3/d3.min.js', dest: 'dist/js/d3.min.js' },
-          { src: 'bower_components/c3/c3.min.js', dest: 'dist/js/c3.min.js' },
-          { src: 'bower_components/papaparse/papaparse.min.js', dest: 'dist/js/papaparse.min.js' },
-          { src: 'bower_components/fullcalendar/dist/fullcalendar.min.js', dest: 'dist/js/fullcalendar.min.js' },
-          { src: 'bower_components/fullcalendar/dist/locale-all.js', dest: 'dist/js/locale-all.js' },
-          { src: 'bower_components/mousetrap/mousetrap.js', dest: 'dist/js/mousetrap.js' },
-          { src: 'bower_components/mousetrap/mousetrap.min.js', dest: 'dist/js/mousetrap.min.js' },
-          { src: 'bower_components/bootstrap/dist/css/bootstrap.min.css', dest: 'dist/css/bootstrap.min.css' },
-          { src: 'bower_components/bootstrap/dist/css/bootstrap.min.css.map', dest: 'dist/css/bootstrap.min.css.map' },
-          { src: 'bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css', dest: 'dist/css/bootstrap-datetimepicker.min.css' },
-          { src: 'bower_components/c3/c3.min.css', dest: 'dist/css/c3.min.css' },
-          { src: 'bower_components/fullcalendar/dist/fullcalendar.min.css', dest: 'dist/css/fullcalendar.min.css' },
-          { expand: true, flatten: true, src: 'bower_components/bootstrap/dist/fonts/*', dest: 'dist/fonts/' },
-          { expand: true, src: 'images', dest: 'dist/images' },
-        ]
-      }
-    },
     watch: {
         scripts: {
             files: ['src/*.js'],
@@ -161,13 +135,13 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-po2json');
-    grunt.task.run(['concat', 'jshint', 'uglify', 'less', 'copy', 'po2json']);
+    grunt.task.run(['concat', 'jshint', 'uglify', 'less', 'po2json']);
     });
   grunt.registerTask('dev', 'Build for development.', function() {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.task.run(['concat', 'jshint', 'less:dev', 'copy']);
+    grunt.task.run(['concat', 'jshint', 'less:dev']);
     });
   grunt.registerTask('devwatch', 'Watch development', function() {
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -188,9 +162,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.task.run(['concat', 'jshint', 'less:dev', 'qunit']);
     });
-  grunt.registerTask('copy', 'Copy resources to dist', function() {
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.task.run(['copy']);
-  });
 
 };
