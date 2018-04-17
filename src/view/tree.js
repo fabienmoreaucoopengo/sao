@@ -1451,8 +1451,7 @@
                             }.bind(this), 0);
                         }.bind(this));
                 } else if (event_.which == Sao.common.ESC_KEYCODE) {
-                    this.tree.edit_row(null);
-                    this.get_static_el().show();
+                    this.get_static_el().show().find('[tabindex=0]').focus();
                 } else if (event_.which == Sao.common.RETURN_KEYCODE) {
                     var focus_cell = function(row) {
                         this._get_column_td(this.edited_column, row)
