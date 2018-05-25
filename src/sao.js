@@ -208,8 +208,8 @@ var Sao = {};
     Sao.config.limit = 1000;
     Sao.config.display_size = 20;
     Sao.config.roundup = {};
-    Sao.config.roundup.url = 'http://bugs.tryton.org/roundup/';
-    Sao.config.title = 'Tryton';
+    Sao.config.roundup.url = 'https://support.coopengo.com/';
+    Sao.config.title = 'Coog';
 
     Sao.i18n = i18n();
     Sao.i18n.setlang = function(lang) {
