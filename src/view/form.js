@@ -3121,12 +3121,16 @@ function eval_pyson(value){
                 o2m_size = null;
                 size_limit = false;
             }
+            var has_form = this.screen.views.some(function(view) {
+                return view.view_type == 'form';
+            }) || ~this.screen.view_to_load.indexOf('form');
             var create = this.attributes.create;
             if (create === undefined) {
                 create = true;
             }
             this.but_new.prop('disabled', this._readonly || !create ||
-                    size_limit || !access.create);
+                    size_limit || !access.create ||
+                !(has_form || this.screen.current_view.editable));
 
             var delete_ = this.attributes['delete'];
             if (delete_ === undefined) {
@@ -3136,7 +3140,8 @@ function eval_pyson(value){
                 !access['delete'] || !this._position);
             this.but_undel.prop('disabled', this._readonly || size_limit ||
                  !this._position);
-            this.but_open.prop('disabled', !access.read || !this._position);
+            this.but_open.prop('disabled', !access.read || !this._position ||
+                !has_form);
             this.but_next.prop('disabled', (this.position > 0) && (
                 this._position >= this._length));
             this.but_previous.prop('disabled', this._position <= 1);
@@ -3395,7 +3400,7 @@ function eval_pyson(value){
             this.screen.switch_view();
         },
         edit: function() {
-            if (!Sao.common.MODELACCESS.get(this.screen.model_name).read) {
+            if (this.but_open.prop('disabled')) {
                 return;
             }
             this.validate().done(function() {
