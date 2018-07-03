@@ -15,8 +15,8 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "^2.1",
-    "bootstrap": "^3.3",
+    "jquery": "^3",
+    "bootstrap": "^3.3.7",
     "moment": "^2.10",
     "eonasdan-bootstrap-datetimepicker": "^4.17",
     "gettext.js": "^0.5",
@@ -24,7 +24,8 @@
     "c3": "^0.4",
     "papaparse": "^4.1",
     "fullcalendar": "^3.0",
-    "mousetrap": "^1.6"
+    "mousetrap": "^1.6",
+    "codemirror": "^5.38"
   },
   "devDependencies": {
     "qunit": "^1.18"
