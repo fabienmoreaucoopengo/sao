@@ -151,14 +151,17 @@
     };
 
     Sao.Session.get_credentials = function() {
+        var database_url = function() {
+            return window.location.hash.replace(
+                /^(#(!|))/, '').split('/', 1)[0] || null;
+        };
         var dfd = jQuery.Deferred();
         // AKE: try to load session from localStorage before launching login
         var session = Sao.Session.current_session || new Sao.Session();
         if (session.load()) {
             return dfd.resolve(session);
         }
-        var database = window.location.hash.replace(
-                /^(#(!|))/, '') || null;
+        var database = database_url();
         var dialog = Sao.Session.login_dialog();
 
         var empty_field = function() {
@@ -185,6 +188,9 @@
                 .then(function() {
                     dfd.resolve(session);
                     dialog.modal.remove();
+                    if (database_url() != database) {
+                        window.location = '#' + database;
+                    }
                 }, function() {
                     dialog.button.prop('disabled', false);
                     dialog.modal.modal('show');
@@ -200,6 +206,9 @@
         dialog.modal.find('form').unbind().submit(function(e) {
             ok_func();
             e.preventDefault();
+        });
+        dialog.modal.on('shown.bs.modal', function() {
+            empty_field().first().focus();
         });
 
         jQuery.when(Sao.DB.list()).then(function(databases) {
