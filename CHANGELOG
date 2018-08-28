@@ -1,3 +1,4 @@
+* BUG#9457 Apply factor on domain parser
 * BUG#9504 Load CodeMiror inside Docker
 * BUG#9468 Fix file extension missing when using excel export from tree view
 * BUG#9467 Display total sum of commission
