@@ -1,3 +1,16 @@
+
+Version 4.8.6 - 2018-09-22
+* Bug fixes (see mercurial logs for details)
+
+Version 4.8.5 - 2018-08-20
+* Bug fixes (see mercurial logs for details)
+
+Version 4.8.4 - 2018-08-03
+* Bug fixes (see mercurial logs for details)
+
+Version 4.8.3 - 2018-07-05
+* Bug fixes (see mercurial logs for details)
+
 * BUG#9960 Correctly set operand for M2M and O2M size_limt
 * BUG#9293 Add linting to rule algorithms
 * BUG#9680 Remove text color change on dropdown menu when hover element

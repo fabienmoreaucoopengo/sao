@@ -92,6 +92,7 @@
         array.record_removed = [];
         array.record_deleted = [];
         array.__readonly = false;
+        array.exclude_field = null;
         array.skip_model_access = false;
         array.forEach(function(e, i, a) {
             e.group = a;
@@ -99,7 +100,7 @@
         array.get_readonly = function() {
             // Must skip res.user for Preference windows
             var access = Sao.common.MODELACCESS.get(this.model.name);
-            if (this.context._datetime ||
+            if (this.context()._datetime ||
                     (!(access.write || access.create) &&
                      !this.skip_model_access)) {
                 return true;
@@ -888,6 +889,9 @@
                 if (!(fname in this.model.fields)) {
                     continue;
                 }
+                if (fname == this.group.exclude_field) {
+                    continue;
+                }
                 if ((this.model.fields[fname] instanceof Sao.field.Many2One) ||
                         (this.model.fields[fname] instanceof Sao.field.Reference)) {
                     var field_rec_name = fname + '.rec_name';
@@ -991,7 +995,8 @@
                 var prm = this.model.execute('on_change',
                         [values, fieldnames], this.get_context());
                 return prm.then(function(changes) {
-                    changes.forEach(this.set_on_change.bind(this));
+                    return jQuery.when.apply(jQuery,
+                        changes.map(this.set_on_change.bind(this)));
                 }.bind(this));
             } else {
                 return jQuery.when();
@@ -1044,7 +1049,8 @@
             }
             var set_on_change = function(fieldname) {
                 return function(result) {
-                    this.model.fields[fieldname].set_on_change(this, result);
+                    return this.model.fields[fieldname].set_on_change(
+                        this, result);
                 };
             };
             for (fieldname in later) {
@@ -1062,6 +1068,7 @@
         },
         set_on_change: function(values) {
             var fieldname, value;
+            var promises = [];
             for (fieldname in values) {
                 if (!values.hasOwnProperty(fieldname)) {
                     continue;
@@ -1081,8 +1088,10 @@
                         delete this._values[field_rec_name];
                     }
                 }
-                this.model.fields[fieldname].set_on_change(this, value);
+                promises.push(
+                    this.model.fields[fieldname].set_on_change(this, value));
             }
+            return jQuery.when.apply(jQuery, promises);
         },
         autocomplete_with: function(fieldname) {
             var promises = [];
@@ -1122,6 +1131,13 @@
         },
         expr_eval: function(expr) {
             if (typeof(expr) != 'string') return expr;
+            if (!expr) {
+                return;
+            } else if (expr == '[]') {
+                return [];
+            } else if (expr == '{}') {
+                return {};
+            }
             var ctx = this.get_eval();
             ctx.context = this.get_context();
             ctx.active_model = this.model.name;
@@ -1142,12 +1158,6 @@
         validate: function(fields, softvalidation, pre_validate, sync) {
             var validate_fields = function() {
                 var result = true;
-                var exclude_fields = [];
-                this.group.screens.forEach(function(screen) {
-                    if (screen.exclude_field) {
-                        exclude_fields.push(screen.exclude_field);
-                    }
-                });
                 for (var fname in this.model.fields) {
                     // Skip not loaded fields if sync and record is not new
                     if (sync && this.id >= 0 && !(fname in this._loaded)) {
@@ -1163,7 +1173,7 @@
                     if (field.description.readonly) {
                         continue;
                     }
-                    if (~exclude_fields.indexOf(fname)) {
+                    if (fname == this.group.exclude_field) {
                         continue;
                     }
                     if (!field.validate(this, softvalidation, pre_validate)) {
@@ -1425,7 +1435,7 @@
             return this.get(record);
         },
         set_default: function(record, value) {
-            record._values[this.name] = value;
+            this.set(record, value);
             record._changed[this.name] = true;
         },
         set_on_change: function(record, value) {
@@ -2109,8 +2119,7 @@
             record._changed[this.name] = true;
             this._set_default_value(record);
             if (value instanceof Array) {
-                this._set_value(record, value, false, true);
-                return;
+                return this._set_value(record, value, false, true);
             }
             var prm = jQuery.when();
             if (value.add || value.update) {
@@ -2165,7 +2174,8 @@
             }.bind(this));
 
             if (value.add || value.update) {
-                prm.then(function(fields) {
+                prm = prm.then(function(fields) {
+                    var promises = [];
                     group.add_fields(fields);
                     if (value.add) {
                         value.add.forEach(function(vals) {
@@ -2173,7 +2183,7 @@
                             var data = vals[1];
                             var new_record = group.new_(false);
                             group.add(new_record, index, false);
-                            new_record.set_on_change(data);
+                            promises.push(new_record.set_on_change(data));
                         });
                     }
                     if (value.update) {
@@ -2183,12 +2193,14 @@
                             }
                             var record2 = group.get(vals.id);
                             if (record2) {
-                                record2.set_on_change(vals);
+                                promises.push(record2.set_on_change(vals));
                             }
                         });
                     }
+                    return jQuery.when.apply(jQuery, promises);
                 }.bind(this));
             }
+            return prm;
         },
         _set_default_value: function(record, model) {
             if (record._values[this.name] !== undefined) {
@@ -2205,6 +2217,7 @@
             group.set_parent(record);
             group.parent_name = this.description.relation_field;
             group.child_name = this.name;
+            group.parent_datetime_field = this.description.datetime_field;
             record._values[this.name] = group;
         },
         get_timestamp: function(record) {
@@ -2323,6 +2336,7 @@
         get: function(record) {
             if (record._values[this.name] &&
                 record._values[this.name][0] &&
+                record._values[this.name][1] !== null &&
                 record._values[this.name][1] >= -1) {
                 return record._values[this.name].join(',');
             }

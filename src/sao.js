@@ -1024,6 +1024,9 @@ var Sao = {};
     })
     .on('hidden.bs.modal', '.modal', function(event) {
         setModalsAndBackdropsOrder();
+        if (jQuery('.modal:visible').length) {
+            $(document.body).addClass('modal-open');
+        }
     });
 
     function setModalsAndBackdropsOrder() {

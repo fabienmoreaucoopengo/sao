@@ -1106,7 +1106,10 @@ function eval_pyson(value){
             } else {
                 this.el.show();
             }
-        }
+        },
+        focus: function() {
+            this.el.focus();
+        },
     });
 
     // [Coog specific]
@@ -1989,7 +1992,6 @@ function eval_pyson(value){
         init: function(field_name, model, attributes) {
             Sao.View.Form.Integer._super.init.call(this, field_name, model,
                 attributes);
-            this.input.attr('width', 8);
             this.input_text = this.input.clone().appendTo(this.group);
             this.input_text.attr('type', 'text');
             this.input.attr('type', 'number');
@@ -2052,16 +2054,17 @@ function eval_pyson(value){
     Sao.View.Form.Float = Sao.class_(Sao.View.Form.Integer, {
         class_: 'form-float',
         display: function(record, field) {
-            var digits = 'any';
+            var step = 'any';
             if (record) {
-                digits = field.digits(record, this.factor);
+                var digits = field.digits(record, this.factor);
                 if (digits) {
-                    digits = digits[1];
-                } else {
-                    digits = 'any';
+                    step = digits[1];
                 }
             }
-            this.input.attr('step', Math.pow(10, -digits));
+            if (step !== 'any') {
+                step = Math.pow(10, -step);
+            }
+            this.input.attr('step', step);
             Sao.View.Form.Float._super.display.call(this, record, field);
         }
     });
@@ -3111,12 +3114,6 @@ function eval_pyson(value){
                 'class': 'input-group input-group-sm'
             }).appendTo(toolbar);
 
-            this.wid_text = jQuery('<input/>', {
-                type: 'text',
-                'class': 'form-control input-sm'
-            }).appendTo(group);
-            this.wid_text.hide();
-
             var buttons = jQuery('<div/>', {
                 'class': 'input-group-btn'
             }).appendTo(group);
@@ -3162,9 +3159,17 @@ function eval_pyson(value){
             this.but_next.click(this.next.bind(this));
 
             if (attributes.add_remove) {
-                this.wid_text.show();
+                this.wid_text = jQuery('<input/>', {
+                    type: 'text',
+                    'class': 'form-control input-sm'
+                }).appendTo(group);
                 // TODO add completion
                 //
+                //
+                buttons =  jQuery('<div/>', {
+                    'class': 'input-group-btn',
+                }).appendTo(group);
+
                 this.but_add = jQuery('<button/>', {
                     'class': 'btn btn-default btn-sm',
                     'type': 'button',
@@ -3379,8 +3384,7 @@ function eval_pyson(value){
                 o2m_size = field.get_eval(record).length;
                 size_limit = (((field_size !== undefined) &&
                             (field_size !== null)) &&
-                        (o2m_size >= field_size) &&
-                        (field_size >= 0));
+                        (o2m_size >= field_size) && (field_size >= 0));
             } else {
                 o2m_size = null;
                 size_limit = false;
@@ -3470,7 +3474,7 @@ function eval_pyson(value){
             }.bind(this));
         },
         focus: function() {
-            if (this.wid_text.is(':visible')) {
+            if (this.attributes.add_remove) {
                 this.wid_text.focus();
             }
         },
@@ -3843,8 +3847,7 @@ function eval_pyson(value){
                 var m2m_size = field.get_eval(record).length;
                 size_limit = (((field_size !== undefined) &&
                             (field_size !== null)) &&
-                        (m2m_size >= field_size) &&
-                        (field_size >= 0));
+                        (m2m_size >= field_size) && (field_size >= 0));
             }
 
             this.entry.prop('disabled', this._readonly);
@@ -4861,7 +4864,6 @@ function eval_pyson(value){
         set_value: function(value) {
             this.input.val(JSON.stringify(value));
         },
-        // Remove method before merge sao
         set_readonly: function(readonly) {
             this._readonly = readonly;
             this.input.prop('disabled', readonly);
