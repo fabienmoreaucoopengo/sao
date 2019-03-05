@@ -227,6 +227,7 @@ var Sao = {};
     Sao.config.roundup = {};
     Sao.config.roundup.url = 'https://support.coopengo.com/';
     Sao.config.title = 'Coog';
+    Sao.config.icon_colors = '#3465a4,#555753,#cc0000'.split(',');
 
     Sao.i18n = i18n();
     Sao.i18n.setlang = function(lang) {
