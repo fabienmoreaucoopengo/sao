@@ -346,7 +346,10 @@
                 return [];
             }
             var i = this.tab.find('li').index(this.tab.find('li.active'));
-            return this.tab_domain[i][1];
+            var ctx = this.tab_domain[i][1][0];
+            var domain = this.tab_domain[i][1][1];
+            var decoder = new Sao.PYSON.Decoder(ctx);
+            return decoder.decode(domain);
         },
         set_tab_counter: function(count, idx) {
             if (jQuery.isEmptyObject(this.tab_counter) || !this.tab) {
@@ -1999,10 +2002,12 @@
             if (name) {
                 query_string.push(['name', dumps(name)]);
             }
-            if (!jQuery.isEmptyObject(this.attributes.tab_domain)) {
-                query_string.push([
-                    'tab_domain', dumps(this.attributes.tab_domain)]);
-            }
+            // XXX: Evaluate tab domain later
+            // Dynamic domain evaluation in screens and tabs
+            // if (!jQuery.isEmptyObject(this.attributes.tab_domain)) {
+            //     query_string.push([
+            //         'tab_domain', dumps(this.attributes.tab_domain)]);
+            // }
             var path = ['model', this.model_name];
             var view_ids = this.views.map(
                 function(v) {return v.view_id;}).concat(this.view_ids);
