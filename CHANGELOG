@@ -6,6 +6,28 @@ Version 5.6.6 - 2020-07-16
 
 Version 5.6.5 - 2020-07-10
 * Bug fixes (see mercurial logs for details)
+* Handle device cookie
+* Add breadcrumb as title of window form
+* Manage help for each selection
+* Display revision on dialog
+* Support empty value for timedelta converter
+* Unify PYSON string format
+
+Version 5.8.0 - 2020-11-02
+* Bug fixes (see mercurial logs for details)
+* Format timedelta in CSV export
+* Manage symbol widget
+* Fallback to model name as title
+* Set treeview footer sticky on bottom
+* Add get, in_ and contains methods to PYSON
+* Manage deletable and writable state
+* Support e-mail template
+* Always encode CSV export in UTF-8
+* Use tempusdominus and Popper for date time picker
+* Support PYSON comparison of date and datetime
+* Customize bootstrap default style
+* Set field's name as input's name attribute
+* Position copied records based on order
 * Sanitize translated RichtText fields content (issue9453)
 
 Version 5.6.4 - 2020-06-29
